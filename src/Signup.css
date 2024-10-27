@@ -1,0 +1,103 @@
+/* Cozy blue theme for SignUp page */
+:root {
+  --cozy-blue: #AEC6CF;
+  --cozy-dark-blue: #517588;
+  --cozy-darker-blue: #34596B;
+  --cozy-light-gray: #F0F4F8;
+  --cozy-error: #ff6f61;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: var(--cozy-light-gray);
+}
+
+.signup-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--cozy-dark-blue);
+}
+
+.message-box {
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--cozy-darker-blue);
+}
+
+.message-box h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.signup-box {
+  background-color: var(--cozy-blue);
+  padding: 30px;
+  border-radius: 8px;
+  width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.signup-box h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: var(--cozy-dark-blue);
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid var(--cozy-dark-blue);
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.signup-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: var(--cozy-dark-blue);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+  background-color: var(--cozy-darker-blue);
+}
+
+.google-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #db4437; /* Google red */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.google-button:hover {
+  background-color: #c13a2e;
+}
+
+.error {
+  color: var(--cozy-error);
+  margin-bottom: 10px;
+}
+.logo {
+  width: 600px; /* Increased size to make the logo bigger */
+  height: auto;
+  margin-bottom: 20px; /* Space between logo and message */
+}
