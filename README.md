@@ -48,5 +48,4 @@ Blue Moon
 * 独自で開発したものの内容をこちらに記載してください
 * 特に力を入れた部分をファイルリンク、またはcommit_idを記載してください。
 * 質問とマッチング機能
-* https://vscode.dev/github/gaush023/euh/blob/main/src/Question.js
-* https://vscode.dev/github/gaush023/euh/blob/main/src/MatchedUsers.js
+  
