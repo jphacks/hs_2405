@@ -1,79 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { db } from './firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-const db = getFirestore();
-const auth = getAuth();
+function EditProfile({ userId }) {
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [bio, setBio] = useState('');
 
-function Profile() {
-    const [user, setUser] = useState(null);
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
-    const [interests, setInterests] = useState('');
-    const [submitted, setSubmitted] = useState(false);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                setUser(currentUser);
-            } else {
-                setUser(null);
-            }
-        });
-        return unsubscribe;
-    }, []);
-
-    const addUserData = async (e) => {
-        e.preventDefault();
-        try {
-            await addDoc(collection(db, 'users'), {
-                userId: user.uid,
-                name,
-                age,
-                interests: interests.split(','),
-                createdAt: new Date(),
-            });
-            console.log('ユーザーが追加されました');
-            setSubmitted(true);  // 送信完了のフラグを設定
-        } catch (error) {
-            console.error('エラー発生:', error);
+  // プロフィールデータを取得
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileDoc = await getDoc(doc(db, 'users', userId));
+        if (profileDoc.exists()) {
+          const profileData = profileDoc.data();
+          setName(profileData.name || '');
+          setAge(profileData.age || '');
+          setBio(profileData.bio || '');
         }
+      } catch (error) {
+        console.error("プロフィールの取得エラー:", error);
+      }
     };
 
-    return (
-        <div>
-            <h2>Profile</h2>
-            {user ? (
-                <div>
-                    <p>ログイン中のユーザー: {user.email}</p>
-                    <form onSubmit={addUserData}>
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Age"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Interests (comma separated)"
-                            value={interests}
-                            onChange={(e) => setInterests(e.target.value)}
-                        />
-                        <button type="submit">Submit</button>
-                    </form>
-                    {submitted && <p>送信が完了しました！</p>}  {/* 送信完了メッセージを表示 */}
-                </div>
-            ) : (
-                <p>ログインしてください</p>
-            )}
-        </div>
-    );
+    fetchProfile();
+  }, [userId]);
+
+  const handleSaveProfile = async () => {
+    try {
+      // userIdもデータに含めて保存
+      await setDoc(doc(db, 'users', userId), { userId, name, age, bio });
+      alert("プロフィールが保存されました");
+    } catch (error) {
+      console.error("プロフィールの保存エラー:", error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>プロフィールを編集</h2>
+      <input type="text" placeholder="名前" value={name} onChange={(e) => setName(e.target.value)} />
+      <input type="number" placeholder="年齢" value={age} onChange={(e) => setAge(e.target.value)} />
+      <textarea placeholder="自己紹介" value={bio} onChange={(e) => setBio(e.target.value)} />
+      <button onClick={handleSaveProfile}>保存</button>
+    </div>
+  );
 }
 
-export default Profile;
+export default EditProfile;

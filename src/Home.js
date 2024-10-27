@@ -10,7 +10,7 @@ function Home() {
         <li><a href="/signup">サインアップ</a></li>
         <li><a href="/dashboard">dashborad</a></li>
         <li><a href="/osusume">おすすめ</a></li>
-        <li><a href="/Chat">トーク</a></li>
+        <li><a href="/chat/:chatId">トーク</a></li>
         <li><a href="/profile">プロフィ-ル</a></li>
         <li><a href="/combinedposts">つぶやき</a></li>
         <li><a href="/addthreequestions">追加</a></li>

@@ -16,7 +16,7 @@ const SignUp = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log('User registered:', userCredential.user);
-      navigate('/dashboard');
+      navigate('/osusume');
     } catch (error) {
       setError(error.message);
     }
@@ -27,7 +27,7 @@ const SignUp = () => {
     try {
       const userCredential = await signInWithPopup(auth, provider);
       console.log('User logged in with Google:', userCredential.user);
-      navigate('/dashboard');
+      navigate('/osusume');
     } catch (error) {
       setError(error.message);
     }

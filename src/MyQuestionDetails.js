@@ -25,6 +25,12 @@ function QuestionDetails({ userId }) {
           id: doc.id,
           ...doc.data()
         }));
+
+        // デバッグ: answerOwnerIdの有無を確認
+        answersData.forEach(answer => {
+          console.log(`Answer ID: ${answer.id}, Owner ID: ${answer.answerOwnerId}`);
+        });
+
         setAnswers(answersData);
         setLoading(false);
       } catch (error) {
@@ -36,56 +42,74 @@ function QuestionDetails({ userId }) {
     fetchQuestionAndAnswers();
   }, [id]);
 
-  const handleEvaluateAnswer = async (answerId, evaluation) => {
-    try {
-      // Likesコレクションから、この回答に対する評価が既に存在するかを確認
-      const likeQuery = query(
-        collection(db, 'Likes'),
-        where('answerId', '==', answerId),
-        where('fromUserId', '==', userId)
-      );
-      const likeSnapshot = await getDocs(likeQuery);
+ const handleEvaluateAnswer = async (answerId, evaluation) => {
+  try {
+    const answer = answers.find(answer => answer.id === answerId);
+    const answerOwnerId = answer ? answer.answerOwnerId : null;
 
-      if (!likeSnapshot.empty) {
-        console.log("既に評価済みです");
-        return;
-      }
-
-      // Answersコレクション内の評価を更新
-      const answerRef = doc(db, 'Answers', answerId);
-      await updateDoc(answerRef, { evaluation, evaluatedBy: userId });
-      console.log(`評価が保存されました: ${evaluation}, by ${userId}`);
-
-      // Likesコレクションにいいね情報を追加
-      const answerOwnerId = '回答の所有者のID'; // ここに適切な回答の所有者IDを取得するロジックを追加してください
-      await addDoc(collection(db, 'Likes'), {
-        answerId,
-        evaluation,
-        fromUserId: userId,
-        toUserId: answerOwnerId,
-        timestamp: new Date()
-      });
-      console.log(`評価がLikesコレクションに保存されました: ${evaluation}, by ${userId}`);
-
-      // 相互「いいね」を確認して保存
-      const isMutualLike = await checkMutualLike(userId, answerOwnerId);
-      if (isMutualLike) {
-        await saveMatch(userId, answerOwnerId);
-        console.log(`相互「いいね」により、ユーザー ${userId} と ${answerOwnerId} のマッチが保存されました`);
-      }
-
-      // ローカルのanswers stateを更新
-      setAnswers(prevAnswers => {
-        const updatedAnswers = prevAnswers.map(answer =>
-          answer.id === answerId ? { ...answer, evaluation, evaluatedBy: userId } : answer
-        );
-        console.log("Updated Answers:", updatedAnswers);
-        return updatedAnswers;
-      });
-    } catch (error) {
-      console.error("Error updating evaluation:", error);
+    if (!answerOwnerId) {
+      console.error("回答の所有者IDが見つかりませんでした");
+      return;
     }
-  };
+
+    // 同じユーザーによる評価はスキップする
+    if (userId === answerOwnerId) {
+      console.log("同一ユーザーによる評価はスキップされました");
+      return;
+    }
+
+    const likeQuery = query(
+      collection(db, 'Likes'),
+      where('answerId', '==', answerId),
+      where('fromUserId', '==', userId)
+    );
+    const likeSnapshot = await getDocs(likeQuery);
+
+    if (!likeSnapshot.empty) {
+      console.log("既に評価済みです");
+      return;
+    }
+
+    const answerRef = doc(db, 'Answers', answerId);
+    await updateDoc(answerRef, { evaluation, evaluatedBy: userId });
+    console.log(`評価が保存されました: ${evaluation}, by ${userId}`);
+
+    await addDoc(collection(db, 'Likes'), {
+      answerId,
+      evaluation,
+      fromUserId: userId,
+      toUserId: answerOwnerId,
+      timestamp: new Date()
+    });
+    console.log(`評価がLikesコレクションに保存されました: ${evaluation}, by ${userId}`);
+
+    const isMutualLike = await checkMutualLike(userId, answerOwnerId);
+    if (isMutualLike) {
+      await saveMatch(userId, answerOwnerId);
+      console.log(`相互「いいね」により、ユーザー ${userId} と ${answerOwnerId} のマッチが保存されました`);
+    }
+
+    setAnswers(prevAnswers => {
+      const index = prevAnswers.findIndex(answer => answer.id === answerId);
+      if (index === -1) return prevAnswers;
+
+      const updatedAnswer = {
+        ...prevAnswers[index],
+        evaluation,
+        evaluatedBy: userId
+      };
+
+      return [
+        ...prevAnswers.slice(0, index),
+        updatedAnswer,
+        ...prevAnswers.slice(index + 1)
+      ];
+    });
+  } catch (error) {
+    console.error("Error updating evaluation:", error);
+    alert("エラーが発生しました。もう一度お試しください。");
+  }
+};
 
   if (loading) return <p>Loading...</p>;
 
@@ -107,7 +131,7 @@ function QuestionDetails({ userId }) {
                   nope
                 </button>
                 <p>評価: {answer.evaluation || '未評価'}</p>
-                <p>評価者: {answer.evaluatedBy || '未評価'}</p> {/* 評価者のIDも表示 */}
+                <p>評価者: {answer.evaluatedBy || '未評価'}</p>
               </li>
             ))}
           </ul>

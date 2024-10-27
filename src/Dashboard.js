@@ -1,67 +1,94 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { auth } from './firebase';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import './Dashboard.css'; // スタイル用のCSSをインポート
+import { db } from './firebase';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom'; // ページ遷移用のフック
 
-const db = getFirestore();
+function Dashboard({ userId }) {
+  const [userProfile, setUserProfile] = useState(null); // 自分のプロフィール
+  const [matches, setMatches] = useState([]); // マッチしたユーザーのプロフィール情報
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // navigateを使ってページ遷移を実行
 
-function Dashboard() {
-    const navigate = useNavigate();
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true); // 読み込み状態
+  useEffect(() => {
+    const fetchProfileAndMatches = async () => {
+      try {
+        // プロフィールの取得
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        console.log("ユーザープロフィールの取得:", userDoc.data());
+        if (userDoc.exists()) {
+          setUserProfile({ id: userDoc.id, ...userDoc.data() });
+        } else {
+          console.log("ユーザープロフィールが存在しません");
+        }
 
-    // ユーザーの認証状態を監視
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            if (!user) {
-                navigate('/login');
-            }
-        });
-        return unsubscribe;
-    }, [navigate]);
+        // マッチの取得
+        const matchesQuery = query(
+          collection(db, 'UserMatches'),
+          where('userId', '==', userId)
+        );
+        const matchSnapshot = await getDocs(matchesQuery);
 
-    // Firestoreからユーザーを取得
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'users'));
-                const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setUsers(usersData);
-            } catch (error) {
-                console.error("ユーザーの取得中にエラーが発生しました:", error);
-            } finally {
-                setLoading(false); // データ取得後に読み込みをfalseにする
-            }
-        };
-        fetchUsers();
-    }, []);
-
-    const handleUserClick = (user) => {
-        navigate(`/chat?userId=${user.id}&userName=${user.name}`); // チャットページに遷移
+        const matchedProfiles = await Promise.all(
+          matchSnapshot.docs.map(async (doc) => {
+            const matchedUserId = doc.data().matchedUserId;
+            const userDoc = await getDoc(doc(db, 'users', matchedUserId));
+            return { id: matchedUserId, ...userDoc.data() };
+          })
+        );
+        setMatches(matchedProfiles);
+      } catch (error) {
+        console.error("fetchProfileAndMatches 関数内のエラー:", error);
+      } finally {
+        // データ取得が完了したので loading 状態を解除
+        setLoading(false);
+      }
     };
 
-    return (
-        <div className="dashboard">
-            <h2 className="dashboard-header">ダッシュボード</h2>
-            <p>これはメインのダッシュボードページです。</p>
-            {loading ? (
-                <p>ユーザーを読み込み中...</p>
-            ) : users.length === 0 ? (
-                <p>ユーザーが見つかりませんでした。</p>
-            ) : (
-                <div className="user-list">
-                    {users.map((user) => (
-                        <div key={user.id} className="user-card" onClick={() => handleUserClick(user)}>
-                            <p className="user-name">{user.name}</p>
-                            <p><strong>年齢:</strong> {user.age}</p>
-                            <p><strong>興味:</strong> {user.interests.join(', ')}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
+    fetchProfileAndMatches();
+  }, [userId]);
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <div className="dashboard">
+      {/* 自分のプロフィールセクション */}
+      <div className="profile-card">
+        <h2>自分のプロフィール</h2>
+        {userProfile ? (
+          <div>
+            <p><strong>ユーザー名:</strong> {userProfile.name}</p>
+            <p><strong>年齢:</strong> {userProfile.age}</p>
+            <p><strong>自己紹介:</strong> {userProfile.bio}</p>
+          </div>
+        ) : (
+          <div>
+            <p>プロフィール情報が見つかりません。</p>
+            <button onClick={() => navigate('/profile')}>
+              プロフィールを作成・編集する
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* マッチしたユーザーのプロフィール一覧 */}
+      <div className="matches-section">
+        <h2>マッチしたユーザー</h2>
+        <div className="matches-grid">
+          {matches.length > 0 ? (
+            matches.map(match => (
+              <div key={match.id} className="match-card">
+                <p><strong>ユーザー名:</strong> {match.name}</p>
+                <p><strong>年齢:</strong> {match.age}</p>
+                <p><strong>自己紹介:</strong> {match.bio}</p>
+              </div>
+            ))
+          ) : (
+            <p>マッチしたユーザーはいません。</p>
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default Dashboard;

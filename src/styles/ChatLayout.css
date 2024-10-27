@@ -1,0 +1,18 @@
+/* ChatLayout.css */
+.chat-layout {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-sidebar {
+  width: 250px;
+  border-right: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,87 +1,98 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { db } from './firebase';
+import { collection, addDoc, query, onSnapshot, doc, getDoc, orderBy } from 'firebase/firestore';
+import './styles/Chat.css';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+async function getUserName(userId) {
+  const userDoc = await getDoc(doc(db, 'users', userId));
+  return userDoc.exists() ? userDoc.data().name : '不明';
+}
 
-const Chat = () => {
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
-    const roomRef = useRef(null);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get('userId'); // ユーザーIDを取得
-    const userName = queryParams.get('userName'); // ユーザー名を取得
+function Chat({ userId }) {
+  const { chatId } = useParams();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [otherUserName, setOtherUserName] = useState(''); // 相手の名前
+  const messageListRef = useRef(null); // Ref for the message list
 
-    const handleInputChange = (event) => {
-        setMessage(event.target.value);
+  useEffect(() => {
+    const fetchOtherUserName = async () => {
+      const chatDoc = await getDoc(doc(db, 'Chats', chatId));
+      if (chatDoc.exists()) {
+        const chatData = chatDoc.data();
+        const otherUserId = chatData.user1 === userId ? chatData.user2 : chatData.user1;
+        const name = await getUserName(otherUserId);
+        setOtherUserName(name);
+      }
     };
 
-    const handleSendMessage = () => {
-        if (message.trim() !== '') {
-            setMessages((prevMessages) => [...prevMessages, message]);
-            console.log('メッセージを送信:', message);
-            setMessage('');
-        }
-    };
+    fetchOtherUserName();
+  }, [chatId, userId]);
 
-    useEffect(() => {
-        if (roomRef.current) {
-            roomRef.current.scrollTop = roomRef.current.scrollHeight;
-        }
-    }, [messages]);
-
-    return (
-        <div>
-            {/* チャット相手の名前を表示 */}
-            <h3>{userName}とのチャット</h3>
-            <div
-                id="room"
-                ref={roomRef}
-                style={{ height: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }} // メッセージ表示領域のスタイル
-            >
-                {/* 送信したメッセージを表示 */}
-                {messages.slice().reverse().map((msg, index) => (
-                    <div key={index} style={styles.messageBubble}>
-                        {msg}
-                    </div>
-                ))}
-            </div>
-
-            <div className="input-group chat-input">
-                <input
-                    id="inputMessage"
-                    type="text"
-                    className="form-control"
-                    placeholder="メッセージを入力してください"
-                    value={message}
-                    onChange={handleInputChange}
-                    style={{ width: '200px', height: '40px' }} // 入力欄のスタイルを調整
-                />
-                <div className="input-group-append">
-                    <button
-                        id="sendBtn"
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={handleSendMessage}
-                        disabled={message.trim() === ''} // 空メッセージのときはボタンを無効に
-                    >
-                        送信
-                    </button>
-                </div>
-            </div>
-        </div>
+  useEffect(() => {
+    const messagesQuery = query(
+      collection(db, 'Chats', chatId, 'Messages'),
+      orderBy('timestamp', 'asc')
     );
-};
 
-// メッセージバブルのスタイル
-const styles = {
-    messageBubble: {
-        borderRadius: '15px', // 端を丸くする
-        backgroundColor: '#f0f0f0', // 背景色
-        padding: '10px', // パディング
-        margin: '5px 0', // メッセージ間のマージン
-        maxWidth: '300px', // バブルの最大幅
-        wordWrap: 'break-word', // 単語の折り返し
-    },
-};
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      setMessages(snapshot.docs.map(doc => doc.data()));
+    });
+
+    return unsubscribe;
+  }, [chatId]);
+
+  useEffect(() => {
+    // Scroll to the bottom of the message list whenever messages change
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (newMessage.trim()) {
+      await addDoc(collection(db, 'Chats', chatId, 'Messages'), {
+        userId,
+        text: newMessage,
+        timestamp: new Date(),
+      });
+      setNewMessage('');
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default behavior (like form submission)
+      sendMessage();
+    }
+  };
+
+  return (
+    <div className="chat-container">
+      <h2>{otherUserName}</h2> {/* Displaying the other user's name */}
+      <div className="message-list" ref={messageListRef}>
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`message ${msg.userId === userId ? 'my-message' : 'other-message'}`}
+          >
+            {msg.text}
+          </div>
+        ))}
+      </div>
+      <div className="input-container">
+        <input
+          className="message-input"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={handleKeyPress} // Listening for Enter key press
+          placeholder="メッセージを入力..."
+        />
+        <button className="send-button" onClick={sendMessage}>送信</button>
+      </div>
+    </div>
+  );
+}
 
 export default Chat;

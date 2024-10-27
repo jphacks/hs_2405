@@ -15,7 +15,8 @@ function QuestionDetails({ userId }) {
         // 質問の取得
         const questionDoc = await getDoc(doc(db, 'Questions', id));
         if (questionDoc.exists()) {
-          setQuestion({ id: questionDoc.id, ...questionDoc.data() });
+          const questionData = questionDoc.data();
+          setQuestion({ id: questionDoc.id, ...questionData });
         }
 
         // 回答の取得
@@ -35,30 +36,33 @@ function QuestionDetails({ userId }) {
   }, [id]);
 
   const handleAnswerSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!newAnswer.trim()) return;
+  if (!newAnswer.trim()) return;
 
-    try {
-      await addDoc(collection(db, 'Answers'), {
-        questionId: id,
-        userId: userId,
-        answer: newAnswer,
-        createdAt: new Date(),
-      });
-      setNewAnswer(""); // 入力欄をクリア
-      // 新しい回答をリロード
-      const answersQuery = query(collection(db, 'Answers'), where('questionId', '==', id));
-      const answersSnapshot = await getDocs(answersQuery);
-      const answersData = answersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setAnswers(answersData);
-    } catch (error) {
-      console.error("Error submitting answer:", error);
-    }
-  };
+  try {
+    // `userId` を `answerOwnerId` として Answers コレクションに新しい回答を追加
+    await addDoc(collection(db, 'Answers'), {
+      questionId: id,
+      answerOwnerId: userId, // 回答者のIDとしてログインしているユーザーIDを保存
+      answer: newAnswer,
+      createdAt: new Date()
+    });
+
+    setNewAnswer(""); // 入力欄をクリア
+
+    // 新しい回答をリロード
+    const answersQuery = query(collection(db, 'Answers'), where('questionId', '==', id));
+    const answersSnapshot = await getDocs(answersQuery);
+    const answersData = answersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setAnswers(answersData);
+  } catch (error) {
+    console.error("Error submitting answer:", error);
+  }
+};
 
   return (
     <div>
