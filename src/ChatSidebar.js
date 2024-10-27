@@ -62,7 +62,7 @@ function ChatSidebar({ userId }) {
         ))}
       </ul>
       <div className="osusume">
-        <Link to="/o">back to osusume</Link>
+        <Link to="/dashboard">back to dashboard</Link>
       </div>
     </div>
   );
