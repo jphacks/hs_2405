@@ -24,6 +24,7 @@
 .message-list {
   flex: 1;
   overflow-y: auto;
+  width: max-content;
   padding: 16px;
   background-color: #e5ddd5;
   display: flex;
