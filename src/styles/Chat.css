@@ -1,16 +1,27 @@
 /* Container for the chat layout */
 .chat-container {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%; /* Set width to 100% */
-  border: 1px solid #ddd;
-  margin: 0; /* Remove margin for full-width layout */
+  width: 90%;
   background-color: #f0f0f0;
 }
 
-/* Header displaying the other user's name */
-.chat-container h2 {
+/* Sidebar for user list */
+.sidebar {
+  width: 25%;
+  padding: 16px;
+  border-right: 1px solid #ddd;
+  background-color: #fff;
+}
+
+/* Chat area */
+.chat-area {
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header for the chat area */
+.chat-area h2 {
   padding: 16px;
   background-color: #4a76a8;
   color: white;
@@ -20,11 +31,11 @@
   border-bottom: 1px solid #ddd;
 }
 
-/* Messages area styling */
+/* Messages area */
 .message-list {
   flex: 1;
   overflow-y: auto;
-  width: max-content;
+  width: 93%;
   padding: 16px;
   background-color: #e5ddd5;
   display: flex;
@@ -60,11 +71,11 @@
 /* Input container at the bottom */
 .input-container {
   display: flex;
+  width: 93%;
   padding: 12px;
-  margin: 8px; 
   border-top: 1px solid #ddd;
   background-color: #fff;
-  border-radius: 12px; /* Optional: Add border-radius for a more rounded look */
+  border-radius: 12px;
 }
 
 /* Message input field styling */

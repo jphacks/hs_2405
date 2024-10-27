@@ -11,8 +11,8 @@ function Dashboard({ currentUserId }) {
   const { profileUserId } = useParams(); 
   const userId = profileUserId || currentUserId;
   const [userProfile, setUserProfile] = useState(null);
+  const [setQuestions] = useState([]);
   const [matches, setMatches] = useState([]);
-  const [questions, setQuestions] = useState([]); // questionsを初期化
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0); // 現在表示中のマッチのインデックス
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false); // フェードエフェクト用の状態

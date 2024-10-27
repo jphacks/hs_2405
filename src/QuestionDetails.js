@@ -7,7 +7,7 @@ import './styles/QuestionDetails.css';
 function QuestionDetails({ userId }) {
   const { id } = useParams();
   const [question, setQuestion] = useState(null);
-  const [answers, setAnswers] = useState([]);
+  const [setAnswers] = useState([]);
   const [newAnswer, setNewAnswer] = useState("");
   const [hasAnswered, setHasAnswered] = useState(false); // すでに回答済みかどうか
 
