@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { db } from './firebase';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc, addDoc } from 'firebase/firestore';
-import { checkMutualLike } from './checkMutualLike'; // 相互「いいね」確認関数をインポート
-import { saveMatch } from './saveMatch'; // マッチを保存する関数をインポート
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import './styles/MyQuestionDetails.css';
+import { checkMutualLike } from './checkMutualLike';
+import { saveMatch } from './saveMatch';
 
 function QuestionDetails({ userId }) {
   const { id } = useParams();
@@ -26,11 +29,6 @@ function QuestionDetails({ userId }) {
           ...doc.data()
         }));
 
-        // デバッグ: answerOwnerIdの有無を確認
-        answersData.forEach(answer => {
-          console.log(`Answer ID: ${answer.id}, Owner ID: ${answer.answerOwnerId}`);
-        });
-
         setAnswers(answersData);
         setLoading(false);
       } catch (error) {
@@ -52,7 +50,6 @@ function QuestionDetails({ userId }) {
       return;
     }
 
-    // 同じユーザーによる評価はスキップする
     if (userId === answerOwnerId) {
       console.log("同一ユーザーによる評価はスキップされました");
       return;
@@ -72,7 +69,6 @@ function QuestionDetails({ userId }) {
 
     const answerRef = doc(db, 'Answers', answerId);
     await updateDoc(answerRef, { evaluation, evaluatedBy: userId });
-    console.log(`評価が保存されました: ${evaluation}, by ${userId}`);
 
     await addDoc(collection(db, 'Likes'), {
       answerId,
@@ -81,29 +77,18 @@ function QuestionDetails({ userId }) {
       toUserId: answerOwnerId,
       timestamp: new Date()
     });
-    console.log(`評価がLikesコレクションに保存されました: ${evaluation}, by ${userId}`);
 
     const isMutualLike = await checkMutualLike(userId, answerOwnerId);
     if (isMutualLike) {
       await saveMatch(userId, answerOwnerId);
-      console.log(`相互「いいね」により、ユーザー ${userId} と ${answerOwnerId} のマッチが保存されました`);
     }
 
     setAnswers(prevAnswers => {
-      const index = prevAnswers.findIndex(answer => answer.id === answerId);
-      if (index === -1) return prevAnswers;
-
-      const updatedAnswer = {
-        ...prevAnswers[index],
-        evaluation,
-        evaluatedBy: userId
-      };
-
-      return [
-        ...prevAnswers.slice(0, index),
-        updatedAnswer,
-        ...prevAnswers.slice(index + 1)
-      ];
+      return prevAnswers.map(answer => 
+        answer.id === answerId
+          ? { ...answer, evaluation, evaluatedBy: userId }
+          : answer
+      );
     });
   } catch (error) {
     console.error("Error updating evaluation:", error);
@@ -114,24 +99,34 @@ function QuestionDetails({ userId }) {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="container">
       <h2>質問詳細</h2>
       {question ? (
         <>
-          <h3>{question.question}</h3>
-          <h4>回答一覧と評価</h4>
+          <h2>{question.question}</h2>
+          <h3>回答一覧と評価</h3>
           <ul>
             {answers.map(answer => (
               <li key={answer.id}>
-                <p>{answer.answer}</p>
-                <button onClick={() => handleEvaluateAnswer(answer.id, 'like')}>
-                  いいね
-                </button>
-                <button onClick={() => handleEvaluateAnswer(answer.id, 'nope')}>
-                  nope
-                </button>
-                <p>評価: {answer.evaluation || '未評価'}</p>
-                <p>評価者: {answer.evaluatedBy || '未評価'}</p>
+                <h4>{answer.answer}</h4>
+                {answer.evaluation ? (
+                  <p className="evaluation-result">
+                    {answer.evaluation === 'like' ? (
+                      <span className="liked"><FontAwesomeIcon icon={faThumbsUp} /> いいね</span>
+                    ) : (
+                      <span className="nope"><FontAwesomeIcon icon={faThumbsDown} /> nope</span>
+                    )}
+                  </p>
+                ) : (
+                  <div className="button-group">
+                    <button className="like" onClick={() => handleEvaluateAnswer(answer.id, 'like')}>
+                      <FontAwesomeIcon icon={faThumbsUp} /> いいね
+                    </button>
+                    <button className="nope" onClick={() => handleEvaluateAnswer(answer.id, 'nope')}>
+                      <FontAwesomeIcon icon={faThumbsDown} /> nope
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -139,6 +134,7 @@ function QuestionDetails({ userId }) {
       ) : (
         <p>質問が見つかりません</p>
       )}
+      <Link to="/osusume" className="back-link"><h4>Go back to matching page</h4></Link>
     </div>
   );
 }

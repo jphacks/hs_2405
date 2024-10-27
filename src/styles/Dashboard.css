@@ -1,0 +1,111 @@
+body {
+  height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f9fc;
+}
+
+.dashboard {
+  max-width: 90%;
+  margin: 20px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.profile-and-emotion {
+  display: flex;
+  gap: 20px;
+}
+
+.profile-card, .emotion-section, .matches-section {
+  flex: 1;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: none; /* シャドウを無くしてシンプルに */
+  text-align: center;
+}
+
+.profile-card h2, .matches-section h2, .emotion-section h3 {
+  color: #333;
+  margin-bottom: 10px;
+  
+  padding-bottom: 5px;
+}
+
+.emotion-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.matches-section {
+  margin-top: 20px;
+  padding: 0;
+}
+
+.matches-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.match-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  width: 80%;
+  border: 1px solid #e0e0e0; /* ボーダーのみにして軽く囲む */
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.match-card:hover {
+  background-color: #f0f4f8;
+}
+
+.match-name, .match-bio {
+  margin: 5px 0;
+}
+
+.chat-icon {
+  color: #4a76a8;
+  font-size: 1.2em;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.emotion-history {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.emotion-day {
+  text-align: center;
+}
+
+.osusume {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.osusume a {
+  padding: 12px 20px;
+  background-color: #4a76a8;
+  color: #fff;
+  font-size: 1em;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.osusume a:hover {
+  background-color: #3a5c85;
+}

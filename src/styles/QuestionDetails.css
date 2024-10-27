@@ -1,0 +1,67 @@
+/* PostQuestion.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f9fc; /* 背景色を淡いブルーに */
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h2 {
+  font-size: 2em;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 入力フィールド間のスペース */
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, textarea:focus {
+  border-color: #4a76a8; /* フォーカス時のボーダー色 */
+}
+
+button {
+  padding: 12px;
+  font-size: 1.1em;
+  color: #fff;
+  margin: 5px 0px 20px 0px;
+  background-color: #4a76a8;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #3a5c85; /* ボタンのホバー時の色 */
+}
+
+p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #4a76a8;
+}

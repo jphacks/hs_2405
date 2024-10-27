@@ -1,0 +1,135 @@
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h2 {
+  font-size: 2em;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+h3 {
+  font-size: 1.5em;
+  color: #555;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+li h4 {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 1em;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button:focus {
+  outline: none;
+}
+
+button.like {
+  background-color: #4caf50;
+}
+
+button.like:hover {
+  background-color: #388e3c;
+}
+
+button.nope {
+  background-color: #f44336;
+}
+
+button.nope:hover {
+  background-color: #d32f2f;
+}
+
+.evaluation-result {
+  font-size: 1.1em;
+  margin-top: 10px;
+}
+
+.evaluation-result .liked {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.evaluation-result .nope {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: #4a76a8;
+  text-decoration: none;
+  font-size: 1em;
+  padding: 10px 20px;
+  border: 2px solid #4a76a8;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.back-link:hover {
+  background-color: #4a76a8;
+  color: #fff;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: #4a76a8;
+  text-decoration: none;
+  font-size: 1em;
+  padding: 10px 20px;
+  border: 2px solid #4a76a8;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.back-link:hover {
+  background-color: #4a76a8;
+  color: #fff;
+}
+
+.back-link h4 {
+  margin: 0;
+  color: white;
+}

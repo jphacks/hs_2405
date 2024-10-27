@@ -3,6 +3,7 @@ import { db } from './firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { getOrCreateChat } from './chatService';
 import { useNavigate } from 'react-router-dom';
+import './styles/MatchedUsers.css';
 
 async function getUserName(userId) {
   const userDoc = await getDoc(doc(db, 'users', userId));

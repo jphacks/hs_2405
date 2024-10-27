@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getOrCreateChat } from './chatService'; 
 import { db } from './firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './styles/ChatSidebar.css';
 
 async function getUserName(userId) {
@@ -12,7 +12,7 @@ async function getUserName(userId) {
 
 function ChatSidebar({ userId }) {
   const [matches, setMatches] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null); // State for selected user
+  const [selectedUserId, setSelectedUserId] = useState(null); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +61,9 @@ function ChatSidebar({ userId }) {
           </li>
         ))}
       </ul>
+      <div className="osusume">
+        <Link to="/o">back to osusume</Link>
+      </div>
     </div>
   );
 }

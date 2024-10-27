@@ -5,6 +5,8 @@
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   margin: 16px;
+  display: flex;
+  flex-direction: column; /* Flex column layout */
 }
 
 .chat-sidebar h2 {
@@ -17,6 +19,7 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1; /* This will allow the ul to take up available space */
 }
 
 .chat-sidebar li {
@@ -45,4 +48,22 @@
   background-color: #d3e2f1; 
   border-left: 4px solid #4a76a8; 
   color: #333;
+}
+
+.osusume {
+    background-color: #333;
+  color: white;
+  margin-top: auto; /* Pushes the osusume link to the bottom */
+  padding: 10px;
+  text-align: center;
+}
+
+.osusume a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.osusume a:hover {
+  color: #3a5b8a;
 }

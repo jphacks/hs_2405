@@ -4,7 +4,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 function EditProfile({ userId }) {
   const [name, setName] = useState('');
-  const [age, setAge] = useState('');
   const [bio, setBio] = useState('');
 
   // プロフィールデータを取得
@@ -15,7 +14,6 @@ function EditProfile({ userId }) {
         if (profileDoc.exists()) {
           const profileData = profileDoc.data();
           setName(profileData.name || '');
-          setAge(profileData.age || '');
           setBio(profileData.bio || '');
         }
       } catch (error) {
@@ -29,7 +27,7 @@ function EditProfile({ userId }) {
   const handleSaveProfile = async () => {
     try {
       // userIdもデータに含めて保存
-      await setDoc(doc(db, 'users', userId), { userId, name, age, bio });
+      await setDoc(doc(db, 'users', userId), { userId, name, bio });
       alert("プロフィールが保存されました");
     } catch (error) {
       console.error("プロフィールの保存エラー:", error);
@@ -40,7 +38,6 @@ function EditProfile({ userId }) {
     <div>
       <h2>プロフィールを編集</h2>
       <input type="text" placeholder="名前" value={name} onChange={(e) => setName(e.target.value)} />
-      <input type="number" placeholder="年齢" value={age} onChange={(e) => setAge(e.target.value)} />
       <textarea placeholder="自己紹介" value={bio} onChange={(e) => setBio(e.target.value)} />
       <button onClick={handleSaveProfile}>保存</button>
     </div>

@@ -62,7 +62,8 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/dashboard" element={<Dashboard userId={userId} />} />
+      <Route path="/dashboard" element={<Dashboard currentUserId={userId} />} />
+      <Route path="/dashboard/:profileUserId" element={<Dashboard currentUserId={userId} />} /> {/* 追加 */}
       <Route path="/profile" element={<EditProfile userId={userId} />} /> 
       <Route path="/combinedposts" element={<CombinedPosts />} />
       <Route path="/questions" element={<QuestionList userId={userId} />} />

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
+import "./styles/PostQuestion.css";
 
 function PostQuestion({ userId }) {
   const [questionText, setQuestionText] = useState('');
@@ -46,6 +48,7 @@ function PostQuestion({ userId }) {
         <button type="submit">投稿</button>
       </form>
       {message && <p>{message}</p>}
+        <Link to="/osusume">Go to matching page</Link>
     </div>
   );
 }
